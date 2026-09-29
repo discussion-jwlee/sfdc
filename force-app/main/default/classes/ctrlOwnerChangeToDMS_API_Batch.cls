@@ -88,24 +88,29 @@ public without sharing class ctrlOwnerChangeToDMS_API_Batch implements Database.
 
          if(!Test.isRunningTest()) httpRes = h_get.send(httpReq);
 
-         //DMS 응답의 results 중 status가 SUCCESS인 건에 해당하는 Account만 후속처리 업데이트
+         //HTTP 상태코드와 무관하게 응답 본문의 results[].status를 항목별로 확인하여 SUCCESS인 건에 해당하는 Account만 후속처리 업데이트
          List<Account> accountList = new List<Account>();
-         if(httpRes.getStatusCode() == 200 && String.isNotBlank(httpRes.getBody())){
-            Map<String, Object> resBodyMap = (Map<String, Object>) JSON.deserializeUntyped(httpRes.getBody());
-            List<Object> results = (List<Object>) resBodyMap.get('results');
-            if(results != null){
-               for(Object resultObj : results){
-                  Map<String, Object> result = (Map<String, Object>) resultObj;
-                  String status = (String) result.get('status');
-                  Integer idx = result.get('index') == null ? null : Integer.valueOf(String.valueOf(result.get('index')));
+         if(String.isNotBlank(httpRes.getBody())){
+            try{
+               Map<String, Object> resBodyMap = (Map<String, Object>) JSON.deserializeUntyped(httpRes.getBody());
+               List<Object> results = (List<Object>) resBodyMap.get('results');
+               if(results != null){
+                  for(Object resultObj : results){
+                     Map<String, Object> result = (Map<String, Object>) resultObj;
+                     String status = (String) result.get('status');
+                     Integer idx = result.get('index') == null ? null : Integer.valueOf(String.valueOf(result.get('index')));
 
-                  if('SUCCESS'.equalsIgnoreCase(status) && idx != null && idx >= 0 && idx < reqAccountList.size() && reqAccountList[idx] != null){
-                     Account acc = reqAccountList[idx];
-                     acc.IsOwnerChange__c = false;
-                     acc.old_owner_id__c = '';
-                     accountList.add(acc);
+                     if('SUCCESS'.equalsIgnoreCase(status) && idx != null && idx >= 0 && idx < reqAccountList.size() && reqAccountList[idx] != null){
+                        Account acc = reqAccountList[idx];
+                        acc.IsOwnerChange__c = false;
+                        acc.old_owner_id__c = '';
+                        accountList.add(acc);
+                     }
                   }
                }
+            }catch(Exception parseEx){
+               system.debug('//========== DMS 응답 파싱 실패 ==========//');
+               system.debug('Error Mag:'+parseEx.getMessage());
             }
          }
 
