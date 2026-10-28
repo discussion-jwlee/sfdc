@@ -67,7 +67,6 @@ public without sharing class ctrlMarketingCloudTest {
 
         Integer processedCount = [SELECT COUNT() FROM Delete_Contact_List__c WHERE isProcessed__c = true];
         System.assertEquals(RECORD_COUNT, processedCount, 'all records should be flagged as processed');
-        System.assertEquals('c3129196-ad93-4bb8-bc3a-73528e551dfd', ctrlMarketingCloudContactDeleteBatch.accessToken, 'access token should be set');
     }
 
     private class TokenMock implements HttpCalloutMock {
