@@ -12,13 +12,12 @@ public with sharing class ctrlSendMarketingCloudAPI_scTest {
     @TestSetup
     static void makeData(){
         // requestAccessToken() 에서 사용하는 Custom Setting
-        // Secret_Code__c 는 ctrlAesDecryptionController.decrypt() 가 복호화할 수 있는 암호문이어야
-        // 토큰 요청 로직까지 커버됨
-        String cipherText = ctrlAesTestDataFactory.encrypt(CLIENT_SECRET);
+        // Secret_Code__c 는 Core_MCE 키로 암호화된 값이어야 decrypt() 를 통과하여 토큰 요청 로직까지 커버됨
+        // (Batch 도 Core_MCE 의 endpoint__c / authURL__c 를 사용하므로 실제 메타데이터 기준으로 암호화)
         insert new MCE_Rotate_Secret_Code__c(
             Name           = 'Delete Contact Integration',
             Secret_Key__c  = 'testClientId',
-            Secret_Code__c = cipherText != null ? cipherText : CLIENT_SECRET
+            Secret_Code__c = ctrlAesCipher.encrypt(CLIENT_SECRET)
         );
 
         List<Delete_Contact_List__c> items = new List<Delete_Contact_List__c>();

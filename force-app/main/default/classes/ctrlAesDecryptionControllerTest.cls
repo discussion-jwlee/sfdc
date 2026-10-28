@@ -5,11 +5,18 @@
 @isTest
 public with sharing class ctrlAesDecryptionControllerTest {
 
+    private static void setConfig() {
+        ctrlAesCipher.configOverride = new AES_Config__mdt(
+            Key__c = '0123456789abcdef0123456789abcdef',
+            IV__c  = 'abcdef9876543210'
+        );
+    }
+
     @isTest
     static void testDecryptSuccess() {
+        setConfig();
         String plainText = 'testClientSecret';
-        String cipherText = ctrlAesTestDataFactory.encrypt(plainText);
-        System.assertNotEquals(null, cipherText, 'could not build cipher text from AES_Config__mdt');
+        String cipherText = ctrlAesCipher.encrypt(plainText);
 
         Test.startTest();
         String result = ctrlAesDecryptionController.decrypt(cipherText);
@@ -20,17 +27,18 @@ public with sharing class ctrlAesDecryptionControllerTest {
 
     @isTest
     static void testDecryptInvalidCipherText() {
-        Boolean isThrown = false;
+        setConfig();
+        AuraHandledException thrown;
 
         Test.startTest();
         try {
             ctrlAesDecryptionController.decrypt('invalidCipherText');
-        } catch (Exception e) {
-            // ctrlAesCipher.AesException 은 AuraHandledException 으로 변환되어 throw 됨
-            isThrown = true;
+        } catch (AuraHandledException e) {
+            thrown = e;
         }
         Test.stopTest();
 
-        System.assert(isThrown, 'decrypt should throw an exception for invalid cipher text');
+        System.assertNotEquals(null, thrown, 'decrypt should throw AuraHandledException');
+        System.assertEquals('복호화에 실패했습니다. 암호문이 올바른지 확인하세요.', thrown.getMessage());
     }
 }
