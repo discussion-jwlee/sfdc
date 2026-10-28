@@ -7,15 +7,18 @@
 @isTest
 public with sharing class ctrlSendMarketingCloudAPI_scTest {
     private static final Integer RECORD_COUNT = 10;
+    private static final String CLIENT_SECRET = 'testClientSecret';
 
     @TestSetup
     static void makeData(){
         // requestAccessToken() 에서 사용하는 Custom Setting
-        // (없으면 NullPointerException 이 catch 되어 토큰 요청 로직이 커버되지 않음)
+        // Secret_Code__c 는 ctrlAesDecryptionController.decrypt() 가 복호화할 수 있는 암호문이어야
+        // 토큰 요청 로직까지 커버됨
+        String cipherText = ctrlAesTestDataFactory.encrypt(CLIENT_SECRET);
         insert new MCE_Rotate_Secret_Code__c(
             Name           = 'Delete Contact Integration',
             Secret_Key__c  = 'testClientId',
-            Secret_Code__c = 'testClientSecret'
+            Secret_Code__c = cipherText != null ? cipherText : CLIENT_SECRET
         );
 
         List<Delete_Contact_List__c> items = new List<Delete_Contact_List__c>();
