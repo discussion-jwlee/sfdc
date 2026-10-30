@@ -1,0 +1,53 @@
+<!--
+  @description       :
+  @author            : donghyun.kim2@cj.net.partial
+  @group             :
+  @last modified on  : 2026-10-30
+  @last modified by  : donghyun.kim2@cj.net.partial
+-->
+<template>
+    <!-- 261030 EXIF(위치정보) 제거를 위해 lightning-file-upload → input 태그로 변경
+         lightning-file-upload 는 파일을 브라우저에서 서버로 바로 전송하므로 업로드 전 가공이 불가능함.
+         input 으로 파일을 받아 canvas 로 다시 그려(재인코딩) EXIF/GPS 등 메타데이터를 모두 제거한 뒤 Apex 로 업로드 -->
+    <div class="upload-container">
+      <template if:true={showInlineMessage}>
+          <div class="inline-message slds-m-bottom_small" role="alert">
+              {inlineMessage}
+          </div>
+      </template>
+
+      <template if:false={showInlineMessage}>
+          <div class="slds-form-element">
+              <template if:false={fileUploaded}>
+                  <label class="slds-form-element__label" for="file-input">파일을 업로드해주세요.</label>
+                  <div class="slds-form-element__control">
+                      <input
+                          type="file"
+                          id="file-input"
+                          class="file-input"
+                          accept={acceptedFormats}
+                          multiple
+                          disabled={isInputDisabled}
+                          onchange={handleFileChange}
+                          aria-label="파일 선택">
+                  </div>
+                  <span class="slds-text-body_small slds-text-color_weak">
+                      최대 3개, 개당 3MB 이하 (PNG, JPG, JPEG)
+                  </span>
+              </template>
+              <template if:true={fileUploaded}>
+                  <p class="slds-text-body_small slds-text-color_weak">
+                      파일 업로드를 완료하였습니다.
+                  </p>
+              </template>
+          </div>
+      </template>
+
+      <template if:true={isLoading}>
+          <div class="slds-m-top_small">
+              <lightning-spinner alternative-text="업로드 중..." size="small"></lightning-spinner>
+              <p class="slds-text-body_small slds-m-top_xx-small">업로드 중...</p>
+          </div>
+      </template>
+  </div>
+</template>
