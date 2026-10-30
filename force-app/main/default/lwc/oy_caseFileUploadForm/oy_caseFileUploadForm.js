@@ -11,6 +11,7 @@ import { NavigationMixin } from 'lightning/navigation';
 import getCaseIdFromToken from '@salesforce/apex/Oy_caseFileUploadController.getCaseIdFromToken';
 import checkCaseSession from '@salesforce/apex/Oy_caseFileUploadController.checkCaseSession';
 import uploadFile from '@salesforce/apex/Oy_caseFileUploadController.uploadFile';
+import syncOfflineVocFiles from '@salesforce/apex/Oy_caseFileUploadController.syncOfflineVocFiles';
 
 const MAX_FILE_COUNT = 3;
 const MAX_FILE_SIZE = 3 * 1024 * 1024; // 원본 파일 기준 3MB
@@ -22,7 +23,7 @@ const ACCEPTED_EXTENSIONS = ['.png', '.jpg', '.jpeg'];
 const MAX_DIMENSION = 2048;           // 긴 변 최대 px
 const INITIAL_QUALITY = 0.85;         // JPEG 초기 품질
 const MIN_QUALITY = 0.5;              // 품질 하한 (이하로는 해상도를 줄임)
-const MAX_BASE64_LENGTH_PER_FILE = 1000000; // 파일당 base64 약 1MB (3개 합산 약 3MB)
+const MAX_BASE64_LENGTH_PER_FILE = 700000; // 파일당 base64 약 700KB (3개 합산 약 2MB, guest heap 6MB 고려)
 
 export default class Oy_caseFileUploadForm extends NavigationMixin(LightningElement) {
     @track myRecordId;
@@ -120,11 +121,19 @@ export default class Oy_caseFileUploadForm extends NavigationMixin(LightningElem
                 fileMap[this.uniqueFileName(fileMap, stripped.name)] = stripped.content;
             }
 
+            // uploadFile 에서 webKey__c 까지 저장하므로 updateContentVersionWebKey 호출 불필요
             const result = await uploadFile({ caseId: this.myRecordId, webKey: this.webKey, fileMap: fileMap });
             console.log('uploadFile result :::', JSON.stringify(result, null, 2));
-            if (result === 'success') {
+            if (result && result.status === 'S') {
+                // 오프라인 VOC 파일 동기화 요청 (실패해도 업로드는 완료 처리)
+                const syncResult = await syncOfflineVocFiles({ caseId: this.myRecordId, contentVersionIdList: result.contentVersionIdList });
+                console.log('syncResult :::', JSON.stringify(syncResult, null, 2));
+
                 this.fileUploaded = true;
                 this.showToast('File(s) Upload', '파일 업로드 성공', 'success');
+            } else if (result && result.status === 'W') {
+                this.isInputDisabled = false;
+                this.showToast('File(s) Upload', result.message, 'warning');
             } else {
                 this.isInputDisabled = false;
                 this.showToast('File(s) Upload', '파일 업로드 실패', 'error');
