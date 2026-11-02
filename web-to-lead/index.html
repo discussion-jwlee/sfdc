@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>입소 상담 신청 | 프리미엄 요양원 (Web-to-Lead Demo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #14284b;
+    --navy-2: #1f3a68;
+    --gold: #b8955a;
+    --gold-soft: #f4ede1;
+    --ink: #1d2433;
+    --muted: #6b7385;
+    --line: #dfe3ea;
+    --bg: #f7f5f1;
+    --card: #ffffff;
+    --error: #c0392b;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    font-family: "Noto Sans KR", system-ui, -apple-system, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- Header ---------- */
+  header.top {
+    background: var(--navy);
+    color: #fff;
+  }
+  header.top .inner {
+    max-width: 1160px; margin: 0 auto; padding: 18px 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; font-family: "Noto Serif KR", serif; font-weight: 700; font-size: 20px; letter-spacing: .02em; }
+  .brand .mark {
+    width: 34px; height: 34px; border-radius: 50%;
+    border: 1.5px solid var(--gold); display: grid; place-items: center;
+    color: var(--gold); font-size: 15px;
+  }
+  .brand small { display: block; font-family: "Noto Sans KR", sans-serif; font-weight: 400; font-size: 11px; color: #c8d0e0; letter-spacing: .18em; }
+  .top .tel { font-size: 14px; color: #d9dfeb; }
+  .top .tel b { color: #fff; font-size: 18px; margin-left: 6px; letter-spacing: .02em; }
+
+  /* ---------- Layout ---------- */
+  main {
+    max-width: 1160px; margin: 0 auto; padding: 56px 24px 80px;
+    display: grid; grid-template-columns: 1fr 1.15fr; gap: 56px; align-items: start;
+  }
+  .intro .eyebrow { color: var(--gold); font-size: 13px; font-weight: 700; letter-spacing: .2em; }
+  .intro h1 {
+    font-family: "Noto Serif KR", serif; font-weight: 700;
+    font-size: clamp(28px, 3.4vw, 40px); line-height: 1.35; margin: 12px 0 18px; color: var(--navy);
+  }
+  .intro p.lead { color: var(--muted); font-size: 16px; margin: 0 0 32px; }
+  .points { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
+  .points li {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 18px 20px; display: grid; grid-template-columns: 40px 1fr; gap: 14px; align-items: start;
+  }
+  .points .ic {
+    width: 40px; height: 40px; border-radius: 10px; background: var(--gold-soft); color: var(--gold);
+    display: grid; place-items: center; font-weight: 700; font-family: "Noto Serif KR", serif;
+  }
+  .points b { display: block; color: var(--navy); font-size: 15px; }
+  .points span { color: var(--muted); font-size: 14px; }
+  .process { margin-top: 28px; display: flex; gap: 8px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+  .process span { background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; }
+  .process span.on { border-color: var(--gold); color: var(--navy); font-weight: 700; }
+
+  /* ---------- Form card ---------- */
+  .card {
+    background: var(--card); border-radius: 20px; padding: 36px 36px 32px;
+    box-shadow: 0 20px 50px -24px rgba(20, 40, 75, .25); border-top: 4px solid var(--gold);
+  }
+  .card h2 { font-family: "Noto Serif KR", serif; margin: 0 0 4px; color: var(--navy); font-size: 22px; }
+  .card .sub { margin: 0 0 24px; color: var(--muted); font-size: 14px; }
+  fieldset { border: 0; padding: 0; margin: 0 0 26px; }
+  legend {
+    font-size: 13px; font-weight: 700; color: var(--gold); letter-spacing: .08em;
+    padding: 0 0 10px; margin-bottom: 14px; border-bottom: 1px solid var(--line); width: 100%;
+  }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 16px; }
+  .grid .full { grid-column: 1 / -1; }
+  label.f { display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+  label.f .req { color: var(--gold); margin-left: 2px; }
+  input[type=text], input[type=email], input[type=tel], input[type=date], select {
+    width: 100%; height: 48px; padding: 0 14px; font: inherit; font-size: 15px; color: var(--ink);
+    border: 1px solid var(--line); border-radius: 10px; background: #fff; outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  select { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+    background-position: calc(100% - 20px) 21px, calc(100% - 15px) 21px; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 36px; }
+  input:focus, select:focus { border-color: var(--navy-2); box-shadow: 0 0 0 3px rgba(31, 58, 104, .12); }
+  .invalid input, .invalid select { border-color: var(--error); }
+  .err { display: none; color: var(--error); font-size: 12.5px; margin-top: 5px; }
+  .invalid .err { display: block; }
+
+  /* segmented radio (관계 / 관심시설) */
+  .seg { display: flex; gap: 8px; flex-wrap: wrap; }
+  .seg input { position: absolute; opacity: 0; pointer-events: none; }
+  .seg label {
+    flex: 1 1 0; min-width: 84px; text-align: center; cursor: pointer; user-select: none;
+    height: 48px; line-height: 46px; border: 1px solid var(--line); border-radius: 10px; font-size: 15px;
+    transition: all .15s;
+  }
+  .seg input:checked + label { border-color: var(--navy); background: var(--navy); color: #fff; font-weight: 500; }
+  .seg input:focus-visible + label { box-shadow: 0 0 0 3px rgba(31, 58, 104, .25); }
+  .invalid .seg label { border-color: var(--error); }
+
+  /* consents */
+  .consent { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .consent .all { background: var(--gold-soft); padding: 14px 16px; font-weight: 700; }
+  .consent .row { padding: 14px 16px; border-top: 1px solid var(--line); }
+  .chk { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 14.5px; }
+  .chk input { width: 20px; height: 20px; accent-color: var(--navy); margin: 0; flex: none; }
+  .chk .tag { font-size: 12px; font-weight: 700; color: var(--gold); }
+  .chk .tag.opt { color: var(--muted); }
+  details { margin: 8px 0 0 30px; font-size: 13px; color: var(--muted); }
+  details summary { cursor: pointer; color: var(--navy-2); width: fit-content; }
+  details table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  details th, details td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
+  details th { background: #fafbfc; width: 96px; font-weight: 500; color: var(--ink); }
+  .consent .row.invalid { background: #fdf3f2; }
+
+  button.submit {
+    width: 100%; height: 56px; border: 0; border-radius: 12px; cursor: pointer;
+    background: var(--navy); color: #fff; font: inherit; font-size: 17px; font-weight: 700; letter-spacing: .04em;
+    transition: background .15s;
+  }
+  button.submit:hover { background: var(--navy-2); }
+  button.submit:disabled { opacity: .6; cursor: progress; }
+  .foot-note { text-align: center; font-size: 12.5px; color: var(--muted); margin: 14px 0 0; }
+
+  .demo-banner {
+    background: #fff8e6; color: #8a6a1f; border: 1px dashed #e2c27a; border-radius: 10px;
+    padding: 10px 14px; font-size: 12.5px; margin-bottom: 22px; display: none;
+  }
+  .demo-banner.show { display: block; }
+
+  footer { border-top: 1px solid var(--line); padding: 24px; text-align: center; color: var(--muted); font-size: 12.5px; }
+
+  @media (max-width: 920px) {
+    main { grid-template-columns: 1fr; gap: 36px; padding-top: 36px; }
+  }
+  @media (max-width: 520px) {
+    header.top .inner { padding: 14px 16px; }
+    .top .tel { display: none; }
+    main { padding: 28px 16px 56px; }
+    .card { padding: 26px 18px 22px; border-radius: 16px; }
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="inner">
+    <div class="brand">
+      <div class="mark">L</div>
+      <div>프리미엄 라이프케어<small>PREMIUM SENIOR CARE</small></div>
+    </div>
+    <div class="tel">입소 상담 <b>1588-0000</b></div>
+  </div>
+</header>
+
+<main>
+  <!-- ===================== 소개 ===================== -->
+  <section class="intro">
+    <div class="eyebrow">ADMISSION CONSULTATION</div>
+    <h1>부모님의 일상이<br>더 품격 있게 이어지도록</h1>
+    <p class="lead">전문 상담 매니저가 어르신의 건강 상태와 생활 습관을 꼼꼼히 듣고,<br>가장 알맞은 케어 플랜과 시설 투어 일정을 안내해 드립니다.</p>
+
+    <ul class="points">
+      <li><div class="ic">1</div><div><b>1:1 전담 케어 매니저</b><span>입소 전 상담부터 적응 기간까지 한 분의 매니저가 함께합니다.</span></div></li>
+      <li><div class="ic">2</div><div><b>의료·간호 협진 체계</b><span>촉탁의 정기 진료와 24시간 간호 인력이 상주합니다.</span></div></li>
+      <li><div class="ic">3</div><div><b>호텔식 주거 & 맞춤 식단</b><span>1~2인실 중심 공간과 영양사가 설계한 개별 식단을 제공합니다.</span></div></li>
+    </ul>
+
+    <div class="process">
+      <span class="on">① 상담 신청</span><span>② 전화 상담</span><span>③ 시설 투어</span><span>④ 입소 안내</span>
+    </div>
+  </section>
+
+  <!-- ===================== Web-to-Lead Form ===================== -->
+  <section class="card">
+    <div id="demoBanner" class="demo-banner">
+      ⚙️ 데모 모드 — <code>CONFIG.debug = true</code> 상태입니다. 제출 시 Salesforce 디버그 페이지가 표시됩니다.
+    </div>
+
+    <h2>입소 상담 신청</h2>
+    <p class="sub">남겨주신 연락처로 영업일 기준 1일 이내에 연락드리겠습니다.</p>
+
+    <!--
+      Salesforce Web-to-Lead
+      - action / oid / 커스텀 필드 ID(00N...)는 아래 <script>의 CONFIG에서 설정합니다.
+      - name 속성이 data-sf 로 지정된 입력은 CONFIG.fieldIds 값으로 런타임에 치환됩니다.
+    -->
+    <form id="leadForm" method="POST" novalidate>
+      <input type="hidden" name="oid" id="sf_oid">
+      <input type="hidden" name="retURL" id="sf_retURL">
+      <input type="hidden" name="encoding" value="UTF-8">
+      <input type="hidden" name="company" id="company">
+      <input type="hidden" name="debug" id="sf_debug" disabled>
+      <input type="hidden" name="debugEmail" id="sf_debugEmail" disabled>
+      <!-- 최초 문의일: 조직 로캘 형식으로 변환된 값이 전송됨 -->
+      <input type="hidden" data-sf="firstInquiryDate" id="firstInquiryDateSf">
+      <!-- 체크박스: 체크 시 "1" 전송 -->
+      <input type="hidden" data-sf="marketingOptIn" id="marketingOptInSf" disabled value="1">
+      <input type="hidden" data-sf="privacyConsent" id="privacyConsentSf" disabled value="1">
+
+      <fieldset>
+        <legend>상담 정보</legend>
+        <div class="grid">
+          <div class="full" data-field="facility">
+            <label class="f">관심시설<span class="req">*</span></label>
+            <div class="seg" role="radiogroup" aria-label="관심시설">
+              <input type="radio" id="fac1" data-sf="interestedFacility" value="위례"><label for="fac1">위례</label>
+              <input type="radio" id="fac2" data-sf="interestedFacility" value="은평"><label for="fac2">은평</label>
+              <input type="radio" id="fac3" data-sf="interestedFacility" value="미정"><label for="fac3">아직 미정</label>
+            </div>
+            <div class="err">관심 있는 시설을 선택해 주세요.</div>
+          </div>
+
+          <div data-field="firstInquiryDate">
+            <label class="f" for="firstInquiryDate">최초 문의일<span class="req">*</span></label>
+            <input type="date" id="firstInquiryDate" required>
+            <div class="err">문의일을 입력해 주세요.</div>
+          </div>
+
+          <div data-field="leadSource">
+            <label class="f" for="lead_source">유입 경로<span class="req">*</span></label>
+            <select id="lead_source" name="lead_source" required>
+              <option value="">어떻게 알게 되셨나요?</option>
+              <option>홈페이지</option>
+              <option>네이버 검색</option>
+              <option>블로그/카페</option>
+              <option>온라인 광고</option>
+              <option>보험 설계사 소개</option>
+              <option>지인 소개</option>
+              <option>언론 보도</option>
+              <option>기타</option>
+            </select>
+            <div class="err">유입 경로를 선택해 주세요.</div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>어르신 · 보호자 정보</legend>
+        <div class="grid">
+          <div data-field="seniorName">
+            <label class="f" for="seniorName">어르신 성함<span class="req">*</span></label>
+            <input type="text" id="seniorName" data-sf="seniorName" maxlength="80" placeholder="예) 김순자" required autocomplete="off">
+            <div class="err">어르신 성함을 입력해 주세요.</div>
+          </div>
+
+          <div data-field="last_name">
+            <label class="f" for="last_name">자녀(보호자) 성함<span class="req">*</span></label>
+            <input type="text" id="last_name" name="last_name" maxlength="80" placeholder="예) 이민준" required autocomplete="name">
+            <div class="err">보호자 성함을 입력해 주세요.</div>
+          </div>
+
+          <div class="full" data-field="relationship">
+            <label class="f">어르신과의 관계<span class="req">*</span></label>
+            <div class="seg" role="radiogroup" aria-label="어르신과의 관계">
+              <input type="radio" id="rel1" data-sf="guardianRelationship" value="자녀"><label for="rel1">자녀</label>
+              <input type="radio" id="rel2" data-sf="guardianRelationship" value="며느리"><label for="rel2">며느리</label>
+              <input type="radio" id="rel3" data-sf="guardianRelationship" value="배우자"><label for="rel3">배우자</label>
+            </div>
+            <div class="err">어르신과의 관계를 선택해 주세요.</div>
+          </div>
+
+          <div data-field="mobile">
+            <label class="f" for="mobile">휴대폰 번호<span class="req">*</span></label>
+            <input type="tel" id="mobile" name="mobile" inputmode="numeric" maxlength="13" placeholder="010-0000-0000" required autocomplete="tel">
+            <div class="err">올바른 휴대폰 번호를 입력해 주세요.</div>
+          </div>
+
+          <div data-field="email">
+            <label class="f" for="email">이메일<span class="req">*</span></label>
+            <input type="email" id="email" name="email" maxlength="80" placeholder="name@example.com" required autocomplete="email">
+            <div class="err">올바른 이메일 주소를 입력해 주세요.</div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>약관 동의</legend>
+        <div class="consent">
+          <div class="all">
+            <label class="chk"><input type="checkbox" id="agreeAll"> 전체 동의</label>
+          </div>
+          <div class="row" data-field="privacy">
+            <label class="chk"><input type="checkbox" id="privacyConsent" class="agree"> <span class="tag">[필수]</span> 개인정보 수집·이용 동의</label>
+            <details>
+              <summary>내용 보기</summary>
+              <table>
+                <tr><th>수집 항목</th><td>어르신 성함, 보호자 성함, 어르신과의 관계, 휴대폰 번호, 이메일, 관심시설, 유입 경로</td></tr>
+                <tr><th>이용 목적</th><td>입소 상담 및 시설 투어 안내, 상담 이력 관리</td></tr>
+                <tr><th>보유 기간</th><td>상담 종료 후 1년 (관계 법령에 따라 보존이 필요한 경우 해당 기간)</td></tr>
+              </table>
+              <p>동의를 거부할 권리가 있으나, 거부 시 상담 신청이 제한됩니다.</p>
+            </details>
+            <div class="err" style="margin-left:30px">개인정보 수집·이용에 동의해 주세요.</div>
+          </div>
+          <div class="row">
+            <label class="chk"><input type="checkbox" id="marketingOptIn" class="agree"> <span class="tag opt">[선택]</span> 마케팅 정보 수신 동의</label>
+            <details>
+              <summary>내용 보기</summary>
+              <table>
+                <tr><th>수신 채널</th><td>문자(SMS/LMS), 이메일</td></tr>
+                <tr><th>내용</th><td>설명회·시설 투어 초대, 프로그램 및 이벤트 소식</td></tr>
+                <tr><th>보유 기간</th><td>동의 철회 시까지</td></tr>
+              </table>
+              <p>동의하지 않으셔도 상담 신청이 가능합니다.</p>
+            </details>
+          </div>
+        </div>
+      </fieldset>
+
+      <button type="submit" class="submit" id="submitBtn">상담 신청하기</button>
+      <p class="foot-note">상담 신청 후 담당 매니저가 직접 연락드립니다.</p>
+    </form>
+  </section>
+</main>
+
+<footer>© 프리미엄 라이프케어 — Salesforce Web-to-Lead 데모 페이지</footer>
+
+<script>
+/* =====================================================================
+ * CONFIG — Salesforce 조직에 맞게 수정하세요.
+ *  · oid       : 설정 > 회사 정보 > Salesforce 조직 ID (15자리)
+ *  · action    : Web-to-Lead 엔드포인트
+ *                (최신 조직은 https://<MyDomain>.my.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8)
+ *  · fieldIds  : 커스텀 필드 ID (설정 > 개체 관리자 > 리드 > 필드 > 필드 선택 시 URL의 00N... 값)
+ *                또는 설정 > Web-to-Lead > "웹 투 리드 양식 생성" 결과 HTML에서 복사
+ *  · dateFormat: 기본 리드 작성자(Default Lead Creator) 로캘의 날짜 형식
+ *                ko_KR → 'YYYY. M. D.' / en_US → 'M/D/YYYY'
+ * ===================================================================== */
+const CONFIG = {
+  oid: '00DXXXXXXXXXXXX',
+  action: 'https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8',
+  retURL: location.href.split('#')[0].replace(/[^/]*$/, '') + 'thanks.html',
+  fieldIds: {
+    interestedFacility:   '00NXXXXXXXXXXX1', // Lead.InterestedFacility__c   (관심시설)
+    firstInquiryDate:     '00NXXXXXXXXXXX2', // Lead.FirstInquiryDate__c    (최초 문의일)
+    seniorName:           '00NXXXXXXXXXXX3', // Lead.SeniorName__c          (어르신 성함)
+    guardianRelationship: '00NXXXXXXXXXXX4', // Lead.GuardianRelationship__c(어르신과의 관계)
+    marketingOptIn:       '00NXXXXXXXXXXX5', // Lead.MarketingOptIn__c      (마케팅 수신동의)
+    privacyConsent:       '00NXXXXXXXXXXX6', // Lead.PrivacyConsent__c      (개인정보 수집동의)
+  },
+  dateFormat: 'YYYY. M. D.',
+  debug: false,
+  debugEmail: '',
+};
+
+(function () {
+  const form = document.getElementById('leadForm');
+  const $ = (id) => document.getElementById(id);
+
+  // ---------- Salesforce 설정 반영 ----------
+  form.action = CONFIG.action;
+  $('sf_oid').value = CONFIG.oid;
+  $('sf_retURL').value = CONFIG.retURL;
+  document.querySelectorAll('[data-sf]').forEach((el) => {
+    const id = CONFIG.fieldIds[el.dataset.sf];
+    if (id) el.name = id;
+  });
+  if (CONFIG.debug) {
+    $('sf_debug').disabled = false; $('sf_debug').value = '1';
+    if (CONFIG.debugEmail) { $('sf_debugEmail').disabled = false; $('sf_debugEmail').value = CONFIG.debugEmail; }
+    $('demoBanner').classList.add('show');
+  }
+
+  // ---------- 최초 문의일 기본값 = 오늘 ----------
+  const today = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  $('firstInquiryDate').value = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+
+  // URL 파라미터로 유입 경로 자동 선택 (예: ?source=네이버 검색 또는 ?utm_source=naver)
+  const params = new URLSearchParams(location.search);
+  const sourceMap = { naver: '네이버 검색', blog: '블로그/카페', cafe: '블로그/카페', ad: '온라인 광고', google: '온라인 광고', agent: '보험 설계사 소개' };
+  const src = params.get('source') || sourceMap[(params.get('utm_source') || '').toLowerCase()];
+  if (src && [...$('lead_source').options].some((o) => o.value === src)) $('lead_source').value = src;
+
+  // ---------- 휴대폰 번호 자동 하이픈 ----------
+  $('mobile').addEventListener('input', (e) => {
+    const d = e.target.value.replace(/\D/g, '').slice(0, 11);
+    e.target.value = d.length < 4 ? d : d.length < 8 ? `${d.slice(0, 3)}-${d.slice(3)}` : `${d.slice(0, 3)}-${d.slice(3, d.length - 4)}-${d.slice(-4)}`;
+  });
+
+  // ---------- 전체 동의 ----------
+  const agrees = [...document.querySelectorAll('.agree')];
+  $('agreeAll').addEventListener('change', (e) => agrees.forEach((c) => { c.checked = e.target.checked; }));
+  agrees.forEach((c) => c.addEventListener('change', () => { $('agreeAll').checked = agrees.every((x) => x.checked); }));
+
+  // ---------- 유효성 검사 ----------
+  const rules = {
+    facility:         () => !!form.querySelector('[data-sf="interestedFacility"]:checked'),
+    firstInquiryDate: () => !!$('firstInquiryDate').value,
+    leadSource:       () => !!$('lead_source').value,
+    seniorName:       () => $('seniorName').value.trim().length > 0,
+    last_name:        () => $('last_name').value.trim().length > 0,
+    relationship:     () => !!form.querySelector('[data-sf="guardianRelationship"]:checked'),
+    mobile:           () => /^01[016789]-?\d{3,4}-?\d{4}$/.test($('mobile').value),
+    email:            () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($('email').value.trim()),
+    privacy:          () => $('privacyConsent').checked,
+  };
+  const check = (key) => {
+    const ok = rules[key]();
+    form.querySelector(`[data-field="${key}"]`).classList.toggle('invalid', !ok);
+    return ok;
+  };
+  // 라디오 그룹은 같은 name이 필요하므로, 필드 ID 치환 전이라도 그룹별 name을 보장
+  document.querySelectorAll('.seg').forEach((g, i) => g.querySelectorAll('input').forEach((r) => { if (!r.name) r.name = `grp_${i}`; }));
+  Object.keys(rules).forEach((key) => {
+    form.querySelector(`[data-field="${key}"]`).addEventListener('change', () => check(key));
+  });
+
+  const formatDate = (iso, fmt) => {
+    const [y, m, d] = iso.split('-').map(Number);
+    return fmt.replace('YYYY', y).replace('MM', pad(m)).replace('DD', pad(d)).replace('M', m).replace('D', d);
+  };
+
+  form.addEventListener('submit', (e) => {
+    const results = Object.keys(rules).map(check);
+    if (results.includes(false)) {
+      e.preventDefault();
+      const first = form.querySelector('.invalid');
+      first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const focusable = first.querySelector('input, select');
+      if (focusable) focusable.focus({ preventScroll: true });
+      return;
+    }
+    // 전송값 정리
+    $('seniorName').value = $('seniorName').value.trim();
+    $('last_name').value = $('last_name').value.trim();
+    $('email').value = $('email').value.trim();
+    $('company').value = `${$('seniorName').value} 어르신 (개인)`;
+    $('firstInquiryDateSf').value = formatDate($('firstInquiryDate').value, CONFIG.dateFormat);
+    $('marketingOptInSf').disabled = !$('marketingOptIn').checked;
+    $('privacyConsentSf').disabled = !$('privacyConsent').checked;
+    $('submitBtn').disabled = true;
+    $('submitBtn').textContent = '전송 중…';
+  });
+})();
+</script>
+</body>
+</html>

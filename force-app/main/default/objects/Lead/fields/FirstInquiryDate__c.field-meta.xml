@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FirstInquiryDate__c</fullName>
+    <label>최초 문의일</label>
+    <description>Web-to-Lead: 고객이 처음 문의한 날짜 (폼 제출일 자동 입력)</description>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Date</type>
+</CustomField>

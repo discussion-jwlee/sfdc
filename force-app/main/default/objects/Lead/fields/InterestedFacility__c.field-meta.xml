@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>InterestedFacility__c</fullName>
+    <label>관심시설</label>
+    <description>Web-to-Lead: 상담 희망 시설</description>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>위례</fullName><default>false</default><label>위례</label></value>
+            <value><fullName>은평</fullName><default>false</default><label>은평</label></value>
+            <value><fullName>미정</fullName><default>false</default><label>아직 정하지 않음</label></value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>
