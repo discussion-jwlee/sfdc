@@ -10,9 +10,9 @@
         <restricted>true</restricted>
         <valueSetDefinition>
             <sorted>false</sorted>
-            <value><fullName>위례</fullName><default>false</default><label>위례</label></value>
-            <value><fullName>은평</fullName><default>false</default><label>은평</label></value>
-            <value><fullName>미정</fullName><default>false</default><label>아직 정하지 않음</label></value>
+            <value><fullName>쏠라체 홈 미사</fullName><default>false</default><label>쏠라체 홈 미사</label></value>
+            <value><fullName>쏠라체 홈 해운대</fullName><default>false</default><label>쏠라체 홈 해운대</label></value>
+            <value><fullName>분당데이케어센터</fullName><default>false</default><label>분당데이케어센터</label></value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

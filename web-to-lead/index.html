@@ -157,6 +157,8 @@
     main { padding: 28px 16px 56px; }
     .card { padding: 26px 18px 22px; border-radius: 16px; }
     .grid { grid-template-columns: 1fr; }
+    .seg-facility { flex-direction: column; }
+    .seg-facility label { flex: none; }
   }
 </style>
 </head>
@@ -222,10 +224,10 @@
         <div class="grid">
           <div class="full" data-field="facility">
             <label class="f">관심시설<span class="req">*</span></label>
-            <div class="seg" role="radiogroup" aria-label="관심시설">
-              <input type="radio" id="fac1" data-sf="interestedFacility" value="위례"><label for="fac1">위례</label>
-              <input type="radio" id="fac2" data-sf="interestedFacility" value="은평"><label for="fac2">은평</label>
-              <input type="radio" id="fac3" data-sf="interestedFacility" value="미정"><label for="fac3">아직 미정</label>
+            <div class="seg seg-facility" role="radiogroup" aria-label="관심시설">
+              <input type="radio" id="fac1" data-sf="interestedFacility" value="쏠라체 홈 미사"><label for="fac1">쏠라체 홈 미사</label>
+              <input type="radio" id="fac2" data-sf="interestedFacility" value="쏠라체 홈 해운대"><label for="fac2">쏠라체 홈 해운대</label>
+              <input type="radio" id="fac3" data-sf="interestedFacility" value="분당데이케어센터"><label for="fac3">분당데이케어센터</label>
             </div>
             <div class="err">관심 있는 시설을 선택해 주세요.</div>
           </div>

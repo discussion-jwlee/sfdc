@@ -14,7 +14,7 @@
 
 | 폼 항목 | 리드 필드 | 유형 | Web-to-Lead name |
 |---|---|---|---|
-| 관심시설 | `InterestedFacility__c` | 선택 목록 (위례 / 은평 / 미정) | 00N… |
+| 관심시설 | `InterestedFacility__c` | 선택 목록 (쏠라체 홈 미사 / 쏠라체 홈 해운대 / 분당데이케어센터) | 00N… |
 | 최초 문의일 | `FirstInquiryDate__c` | 날짜 (기본값: 오늘) | 00N… |
 | 유입 경로 | `LeadSource` (표준) | 선택 목록 | `lead_source` |
 | 어르신 성함 | `SeniorName__c` | 텍스트(80) | 00N… |
@@ -52,4 +52,4 @@
 
 - `?source=네이버 검색` 또는 `?utm_source=naver|blog|ad|agent` 파라미터로 유입 경로가 자동 선택됩니다. 채널별 링크를 따로 만들어 유입 경로 리포트를 시연할 수 있습니다.
 - 휴대폰 번호는 입력 중 자동으로 하이픈이 들어가며, 필수 항목/형식 검증 후 전송됩니다.
-- 관심시설 값(위례/은평)은 데모용입니다. 실제 시설명에 맞춰 `InterestedFacility__c` 선택 목록과 `index.html`의 라디오 버튼을 함께 수정하세요.
+- 관심시설 값을 바꿀 때는 `InterestedFacility__c` 선택 목록과 `index.html`의 라디오 버튼을 함께 수정하세요.
