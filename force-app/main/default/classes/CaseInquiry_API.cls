@@ -4,7 +4,7 @@
 * Date            : 2026-11-10
 * Tester          : CaseInquiry_API_Test.cls
 * Description     : 고객ID(username__c) 기준 Case 조회 REST API
-*                   - Case 스탠다드 필드 전체
+*                   - Case 스탠다드 필드 전체 (Status는 외부 전송용 값으로 변환)
 *                   - Case에 연결된 파일(ContentDocument) 파일명/확장자/사이즈/생성일
 *
 * Endpoint : GET /services/apexrest/api/v1/cases?username={고객ID}
@@ -32,6 +32,18 @@ global with sharing class CaseInquiry_API {
 
     // 한 번에 반환할 최대 Case 건수 (Heap/SOQL 한도 보호)
     @TestVisible private static final Integer MAX_CASES = 2000;
+
+    // 외부 전송용 Case Status 변환 (Salesforce Status → 외부 시스템 Status)
+    // 매핑에 없는 값은 원본 그대로 전송
+    @TestVisible private static final Map<String, String> STATUS_MAPPING = new Map<String, String>{
+        'Resolved'    => 'Closed',
+        'Closed'      => 'Closed',
+        'New'         => 'Assigned',
+        'Assigned'    => 'Assigned',
+        'In Progress' => 'Assigned',
+        'Need Info'   => 'Assigned',
+        'Escalation'  => 'Assigned'
+    };
 
     @HttpGet
     global static void getCases() {
@@ -84,11 +96,27 @@ global with sharing class CaseInquiry_API {
             for (String f : fieldNames) {
                 caseMap.put(f, c.get(f));
             }
+            if (caseMap.containsKey('Status')) {
+                caseMap.put('Status', convertStatus(c.Status));
+            }
             List<FileInfo> files = filesByCaseId.get(c.Id);
             caseMap.put('files', files == null ? new List<FileInfo>() : files);
             resultList.add(caseMap);
         }
         return resultList;
+    }
+
+    /**
+     * Case Status를 외부 전송용 값으로 변환
+     *  - Resolved, Closed                                → Closed
+     *  - New, Assigned, In Progress, Need Info, Escalation → Assigned
+     *  - 그 외 값은 원본 그대로 반환
+     */
+    @TestVisible
+    private static String convertStatus(String status) {
+        if (status == null) return null;
+        String mapped = STATUS_MAPPING.get(status);
+        return mapped == null ? status : mapped;
     }
 
     /**

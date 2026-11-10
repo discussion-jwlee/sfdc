@@ -53,6 +53,7 @@ private class CaseInquiry_API_Test {
             Map<String, Object> c = (Map<String, Object>) o;
             System.assert(c.containsKey('Id'));
             System.assert(c.containsKey('CaseNumber'));
+            System.assertEquals('Assigned', c.get('Status'), 'New는 Assigned로 변환되어야 함');
             System.assert(!c.containsKey('username__c'), '커스텀 필드는 반환하지 않아야 함');
             for (Object fo : (List<Object>) c.get('files')) {
                 Map<String, Object> f = (Map<String, Object>) fo;
@@ -64,6 +65,19 @@ private class CaseInquiry_API_Test {
             }
         }
         System.assertEquals(1, fileCount);
+    }
+
+    @IsTest
+    static void testConvertStatus() {
+        System.assertEquals('Closed',   CaseInquiry_API.convertStatus('Resolved'));
+        System.assertEquals('Closed',   CaseInquiry_API.convertStatus('Closed'));
+        System.assertEquals('Assigned', CaseInquiry_API.convertStatus('New'));
+        System.assertEquals('Assigned', CaseInquiry_API.convertStatus('Assigned'));
+        System.assertEquals('Assigned', CaseInquiry_API.convertStatus('In Progress'));
+        System.assertEquals('Assigned', CaseInquiry_API.convertStatus('Need Info'));
+        System.assertEquals('Assigned', CaseInquiry_API.convertStatus('Escalation'));
+        System.assertEquals('Other',    CaseInquiry_API.convertStatus('Other'));
+        System.assertEquals(null,       CaseInquiry_API.convertStatus(null));
     }
 
     @IsTest
