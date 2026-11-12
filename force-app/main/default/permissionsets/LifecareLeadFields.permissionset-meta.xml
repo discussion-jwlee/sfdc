@@ -3,10 +3,13 @@
     <label>요양원 상담 리드 필드</label>
     <description>Web-to-Lead 데모용 Lead 커스텀 필드 읽기/편집 권한</description>
     <hasActivationRequired>false</hasActivationRequired>
-    <fieldPermissions><editable>true</editable><field>Lead.InterestedFacility__c</field><readable>true</readable></fieldPermissions>
-    <fieldPermissions><editable>true</editable><field>Lead.FirstInquiryDate__c</field><readable>true</readable></fieldPermissions>
-    <fieldPermissions><editable>true</editable><field>Lead.SeniorName__c</field><readable>true</readable></fieldPermissions>
+    <fieldPermissions><editable>true</editable><field>Lead.Admission_Facility__c</field><readable>true</readable></fieldPermissions>
+    <fieldPermissions><editable>true</editable><field>Lead.Elder_Age__c</field><readable>true</readable></fieldPermissions>
+    <fieldPermissions><editable>true</editable><field>Lead.Elder_Gender__c</field><readable>true</readable></fieldPermissions>
     <fieldPermissions><editable>true</editable><field>Lead.GuardianRelationship__c</field><readable>true</readable></fieldPermissions>
-    <fieldPermissions><editable>true</editable><field>Lead.MarketingOptIn__c</field><readable>true</readable></fieldPermissions>
+    <fieldPermissions><editable>true</editable><field>Lead.Consultation_Content__c</field><readable>true</readable></fieldPermissions>
     <fieldPermissions><editable>true</editable><field>Lead.PrivacyConsent__c</field><readable>true</readable></fieldPermissions>
+    <fieldPermissions><editable>true</editable><field>Lead.PrivacyConsentDate__c</field><readable>true</readable></fieldPermissions>
+    <fieldPermissions><editable>true</editable><field>Lead.MarketingOptIn__c</field><readable>true</readable></fieldPermissions>
+    <fieldPermissions><editable>true</editable><field>Lead.MarketingOptInDate__c</field><readable>true</readable></fieldPermissions>
 </PermissionSet>

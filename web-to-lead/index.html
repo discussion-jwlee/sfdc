@@ -92,19 +92,27 @@
   .grid .full { grid-column: 1 / -1; }
   label.f { display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; }
   label.f .req { color: var(--gold); margin-left: 2px; }
-  input[type=text], input[type=email], input[type=tel], input[type=date], select {
+  input[type=text], input[type=email], input[type=tel], input[type=number], select, textarea {
     width: 100%; height: 48px; padding: 0 14px; font: inherit; font-size: 15px; color: var(--ink);
     border: 1px solid var(--line); border-radius: 10px; background: #fff; outline: none;
     transition: border-color .15s, box-shadow .15s;
   }
   select { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
     background-position: calc(100% - 20px) 21px, calc(100% - 15px) 21px; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 36px; }
-  input:focus, select:focus { border-color: var(--navy-2); box-shadow: 0 0 0 3px rgba(31, 58, 104, .12); }
-  .invalid input, .invalid select { border-color: var(--error); }
+  textarea { height: auto; min-height: 112px; padding: 12px 14px; resize: vertical; line-height: 1.6; }
+  input[type=number] { -moz-appearance: textfield; }
+  input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  .suffix { position: relative; }
+  .suffix input { padding-right: 40px; }
+  .suffix::after { content: attr(data-suffix); position: absolute; right: 14px; top: 13px; color: var(--muted); font-size: 15px; pointer-events: none; }
+  label.f .hint { font-weight: 400; color: var(--muted); font-size: 12.5px; margin-left: 6px; }
+  .counter { text-align: right; font-size: 12px; color: var(--muted); margin-top: 4px; }
+  input:focus, select:focus, textarea:focus { border-color: var(--navy-2); box-shadow: 0 0 0 3px rgba(31, 58, 104, .12); }
+  .invalid input, .invalid select, .invalid textarea { border-color: var(--error); }
   .err { display: none; color: var(--error); font-size: 12.5px; margin-top: 5px; }
   .invalid .err { display: block; }
 
-  /* segmented radio (관계 / 관심시설) */
+  /* segmented radio / checkbox (입소시설 · 성별 · 관계) */
   .seg { display: flex; gap: 8px; flex-wrap: wrap; }
   .seg input { position: absolute; opacity: 0; pointer-events: none; }
   .seg label {
@@ -195,7 +203,7 @@
   <!-- ===================== Web-to-Lead Form ===================== -->
   <section class="card">
     <div id="demoBanner" class="demo-banner">
-      ⚙️ 데모 모드 — <code>CONFIG.debug = true</code> 상태입니다. 제출 시 Salesforce 디버그 페이지가 표시됩니다.
+      ⚙️ 디버그 모드 — <code>CONFIG.debug = true</code> 상태입니다. 제출 시 Salesforce 디버그 페이지가 표시됩니다.
     </div>
 
     <h2>입소 상담 신청</h2>
@@ -203,43 +211,56 @@
 
     <!--
       Salesforce Web-to-Lead
-      - action / oid / 커스텀 필드 ID(00N...)는 아래 <script>의 CONFIG에서 설정합니다.
-      - name 속성이 data-sf 로 지정된 입력은 CONFIG.fieldIds 값으로 런타임에 치환됩니다.
+      ┌──────────────────────┬──────────────────────────────┬──────────────────┐
+      │ 화면 항목            │ Lead 필드                    │ name             │
+      ├──────────────────────┼──────────────────────────────┼──────────────────┤
+      │ 입소시설 (다중)      │ Admission_Facility__c        │ 00Nak00005dAlE9  │
+      │ 상담 경로            │ LeadSource                   │ lead_source      │
+      │ 어르신명             │ Company                      │ company          │
+      │ 어르신 나이          │ Elder_Age__c                 │ 00Nak00005d5QDm  │
+      │ 어르신 성별          │ Elder_Gender__c              │ 00Nak00005dE89Z  │
+      │ 보호자명             │ Name (LastName)              │ last_name        │
+      │ 어르신과의 관계      │ GuardianRelationship__c      │ 00Nak00005fPuT3  │
+      │ 휴대폰               │ MobilePhone                  │ mobile           │
+      │ 이메일               │ Email                        │ email            │
+      │ 상담내용             │ Consultation_Content__c      │ 00Nak00005dEGn3  │
+      │ 개인정보 수집동의    │ PrivacyConsent__c            │ 00Nak00005fPzR7  │
+      │ 개인정보 동의 날짜   │ PrivacyConsentDate__c (숨김) │ 00Nak00005fPlFN  │
+      │ 마케팅 수신동의      │ MarketingOptIn__c            │ 00Nak00005fPqpO  │
+      │ 마케팅 동의 날짜     │ MarketingOptInDate__c (숨김) │ 00Nak00005fQ0Jx  │
+      │ 레코드 유형          │ RecordTypeId (숨김)          │ recordType       │
+      └──────────────────────┴──────────────────────────────┴──────────────────┘
+      oid / action / retURL / 날짜 형식은 아래 <script>의 CONFIG에서 설정합니다.
     -->
     <form id="leadForm" method="POST" novalidate>
       <input type="hidden" name="oid" id="sf_oid">
       <input type="hidden" name="retURL" id="sf_retURL">
       <input type="hidden" name="encoding" value="UTF-8">
-      <input type="hidden" name="company" id="company">
+      <input type="hidden" name="recordType" value="012ak00000EvPuTAAV">
       <input type="hidden" name="debug" id="sf_debug" disabled>
       <input type="hidden" name="debugEmail" id="sf_debugEmail" disabled>
-      <!-- 최초 문의일: 조직 로캘 형식으로 변환된 값이 전송됨 -->
-      <input type="hidden" data-sf="firstInquiryDate" id="firstInquiryDateSf">
-      <!-- 체크박스: 체크 시 "1" 전송 -->
-      <input type="hidden" data-sf="marketingOptIn" id="marketingOptInSf" disabled value="1">
-      <input type="hidden" data-sf="privacyConsent" id="privacyConsentSf" disabled value="1">
+
+      <!-- 숨김값: 동의 체크박스는 체크 시 "1", 동의 날짜는 제출일(조직 로캘 형식) -->
+      <input type="hidden" name="00Nak00005fPzR7" id="privacyConsentSf" value="1" disabled>
+      <input type="hidden" name="00Nak00005fPlFN" id="privacyConsentDateSf" disabled>
+      <input type="hidden" name="00Nak00005fPqpO" id="marketingOptInSf" value="1" disabled>
+      <input type="hidden" name="00Nak00005fQ0Jx" id="marketingOptInDateSf" disabled>
 
       <fieldset>
         <legend>상담 정보</legend>
         <div class="grid">
           <div class="full" data-field="facility">
-            <label class="f">관심시설<span class="req">*</span></label>
-            <div class="seg seg-facility" role="radiogroup" aria-label="관심시설">
-              <input type="radio" id="fac1" data-sf="interestedFacility" value="쏠라체 홈 미사"><label for="fac1">쏠라체 홈 미사</label>
-              <input type="radio" id="fac2" data-sf="interestedFacility" value="쏠라체 홈 해운대"><label for="fac2">쏠라체 홈 해운대</label>
-              <input type="radio" id="fac3" data-sf="interestedFacility" value="분당데이케어센터"><label for="fac3">분당데이케어센터</label>
+            <label class="f">입소시설<span class="req">*</span><span class="hint">복수 선택 가능</span></label>
+            <div class="seg seg-facility" role="group" aria-label="입소시설">
+              <input type="checkbox" id="fac1" name="00Nak00005dAlE9" value="쏠라체 홈 미사"><label for="fac1">쏠라체 홈 미사</label>
+              <input type="checkbox" id="fac2" name="00Nak00005dAlE9" value="쏠라체 홈 해운대"><label for="fac2">쏠라체 홈 해운대</label>
+              <input type="checkbox" id="fac3" name="00Nak00005dAlE9" value="분당데이케어센터"><label for="fac3">분당데이케어센터</label>
             </div>
-            <div class="err">관심 있는 시설을 선택해 주세요.</div>
+            <div class="err">상담받으실 시설을 1개 이상 선택해 주세요.</div>
           </div>
 
-          <div data-field="firstInquiryDate">
-            <label class="f" for="firstInquiryDate">최초 문의일<span class="req">*</span></label>
-            <input type="date" id="firstInquiryDate" required>
-            <div class="err">문의일을 입력해 주세요.</div>
-          </div>
-
-          <div data-field="leadSource">
-            <label class="f" for="lead_source">유입 경로<span class="req">*</span></label>
+          <div class="full" data-field="leadSource">
+            <label class="f" for="lead_source">상담 경로<span class="req">*</span></label>
             <select id="lead_source" name="lead_source" required>
               <option value="">어떻게 알게 되셨나요?</option>
               <option>홈페이지</option>
@@ -251,22 +272,43 @@
               <option>언론 보도</option>
               <option>기타</option>
             </select>
-            <div class="err">유입 경로를 선택해 주세요.</div>
+            <div class="err">상담 경로를 선택해 주세요.</div>
           </div>
         </div>
       </fieldset>
 
       <fieldset>
-        <legend>어르신 · 보호자 정보</legend>
+        <legend>어르신 정보</legend>
         <div class="grid">
-          <div data-field="seniorName">
-            <label class="f" for="seniorName">어르신 성함<span class="req">*</span></label>
-            <input type="text" id="seniorName" data-sf="seniorName" maxlength="80" placeholder="예) 김순자" required autocomplete="off">
+          <div class="full" data-field="company">
+            <label class="f" for="company">어르신명<span class="req">*</span></label>
+            <input type="text" id="company" name="company" maxlength="255" placeholder="예) 김순자" required autocomplete="off">
             <div class="err">어르신 성함을 입력해 주세요.</div>
           </div>
 
-          <div data-field="last_name">
-            <label class="f" for="last_name">자녀(보호자) 성함<span class="req">*</span></label>
+          <div data-field="age">
+            <label class="f" for="elderAge">어르신 나이</label>
+            <div class="suffix" data-suffix="세">
+              <input type="number" id="elderAge" name="00Nak00005d5QDm" inputmode="numeric" min="1" max="120" step="1" placeholder="예) 82">
+            </div>
+            <div class="err">나이는 1~120 사이 숫자로 입력해 주세요.</div>
+          </div>
+
+          <div data-field="gender">
+            <label class="f">어르신 성별</label>
+            <div class="seg" role="radiogroup" aria-label="어르신 성별">
+              <input type="radio" id="gen1" name="00Nak00005dE89Z" value="남성"><label for="gen1">남성</label>
+              <input type="radio" id="gen2" name="00Nak00005dE89Z" value="여성"><label for="gen2">여성</label>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>보호자 정보</legend>
+        <div class="grid">
+          <div class="full" data-field="last_name">
+            <label class="f" for="last_name">보호자명<span class="req">*</span></label>
             <input type="text" id="last_name" name="last_name" maxlength="80" placeholder="예) 이민준" required autocomplete="name">
             <div class="err">보호자 성함을 입력해 주세요.</div>
           </div>
@@ -274,15 +316,15 @@
           <div class="full" data-field="relationship">
             <label class="f">어르신과의 관계<span class="req">*</span></label>
             <div class="seg" role="radiogroup" aria-label="어르신과의 관계">
-              <input type="radio" id="rel1" data-sf="guardianRelationship" value="자녀"><label for="rel1">자녀</label>
-              <input type="radio" id="rel2" data-sf="guardianRelationship" value="며느리"><label for="rel2">며느리</label>
-              <input type="radio" id="rel3" data-sf="guardianRelationship" value="배우자"><label for="rel3">배우자</label>
+              <input type="radio" id="rel1" name="00Nak00005fPuT3" value="자녀"><label for="rel1">자녀</label>
+              <input type="radio" id="rel2" name="00Nak00005fPuT3" value="며느리"><label for="rel2">며느리</label>
+              <input type="radio" id="rel3" name="00Nak00005fPuT3" value="배우자"><label for="rel3">배우자</label>
             </div>
             <div class="err">어르신과의 관계를 선택해 주세요.</div>
           </div>
 
           <div data-field="mobile">
-            <label class="f" for="mobile">휴대폰 번호<span class="req">*</span></label>
+            <label class="f" for="mobile">휴대폰<span class="req">*</span></label>
             <input type="tel" id="mobile" name="mobile" inputmode="numeric" maxlength="13" placeholder="010-0000-0000" required autocomplete="tel">
             <div class="err">올바른 휴대폰 번호를 입력해 주세요.</div>
           </div>
@@ -291,6 +333,12 @@
             <label class="f" for="email">이메일<span class="req">*</span></label>
             <input type="email" id="email" name="email" maxlength="80" placeholder="name@example.com" required autocomplete="email">
             <div class="err">올바른 이메일 주소를 입력해 주세요.</div>
+          </div>
+
+          <div class="full" data-field="consultation">
+            <label class="f" for="consultation">상담내용</label>
+            <textarea id="consultation" name="00Nak00005dEGn3" maxlength="2000" placeholder="어르신의 건강 상태, 장기요양등급, 희망 입소 시기, 궁금하신 점 등을 자유롭게 적어 주세요."></textarea>
+            <div class="counter"><span id="consultationCount">0</span> / 2,000</div>
           </div>
         </div>
       </fieldset>
@@ -306,7 +354,7 @@
             <details>
               <summary>내용 보기</summary>
               <table>
-                <tr><th>수집 항목</th><td>어르신 성함, 보호자 성함, 어르신과의 관계, 휴대폰 번호, 이메일, 관심시설, 유입 경로</td></tr>
+                <tr><th>수집 항목</th><td>어르신명·나이·성별, 보호자명, 어르신과의 관계, 휴대폰, 이메일, 입소시설, 상담 경로, 상담내용</td></tr>
                 <tr><th>이용 목적</th><td>입소 상담 및 시설 투어 안내, 상담 이력 관리</td></tr>
                 <tr><th>보유 기간</th><td>상담 종료 후 1년 (관계 법령에 따라 보존이 필요한 경우 해당 기간)</td></tr>
               </table>
@@ -340,26 +388,17 @@
 <script>
 /* =====================================================================
  * CONFIG — Salesforce 조직에 맞게 수정하세요.
- *  · oid       : 설정 > 회사 정보 > Salesforce 조직 ID (15자리)
+ *  · oid       : 설정 > 회사 정보 > Salesforce 조직 ID (15자리, 00D로 시작)
  *  · action    : Web-to-Lead 엔드포인트
- *                (최신 조직은 https://<MyDomain>.my.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8)
- *  · fieldIds  : 커스텀 필드 ID (설정 > 개체 관리자 > 리드 > 필드 > 필드 선택 시 URL의 00N... 값)
- *                또는 설정 > Web-to-Lead > "웹 투 리드 양식 생성" 결과 HTML에서 복사
+ *                (My Domain 사용 시 https://<MyDomain>.my.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8)
  *  · dateFormat: 기본 리드 작성자(Default Lead Creator) 로캘의 날짜 형식
  *                ko_KR → 'YYYY. M. D.' / en_US → 'M/D/YYYY'
+ *                (형식이 맞지 않으면 날짜 필드가 비어 저장됩니다)
  * ===================================================================== */
 const CONFIG = {
   oid: '00DXXXXXXXXXXXX',
   action: 'https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8',
-  retURL: location.href.split('#')[0].replace(/[^/]*$/, '') + 'thanks.html',
-  fieldIds: {
-    interestedFacility:   '00NXXXXXXXXXXX1', // Lead.InterestedFacility__c   (관심시설)
-    firstInquiryDate:     '00NXXXXXXXXXXX2', // Lead.FirstInquiryDate__c    (최초 문의일)
-    seniorName:           '00NXXXXXXXXXXX3', // Lead.SeniorName__c          (어르신 성함)
-    guardianRelationship: '00NXXXXXXXXXXX4', // Lead.GuardianRelationship__c(어르신과의 관계)
-    marketingOptIn:       '00NXXXXXXXXXXX5', // Lead.MarketingOptIn__c      (마케팅 수신동의)
-    privacyConsent:       '00NXXXXXXXXXXX6', // Lead.PrivacyConsent__c      (개인정보 수집동의)
-  },
+  retURL: location.href.split(/[?#]/)[0].replace(/[^/]*$/, '') + 'thanks.html',
   dateFormat: 'YYYY. M. D.',
   debug: false,
   debugEmail: '',
@@ -368,89 +407,90 @@ const CONFIG = {
 (function () {
   const form = document.getElementById('leadForm');
   const $ = (id) => document.getElementById(id);
+  const pad = (n) => String(n).padStart(2, '0');
 
   // ---------- Salesforce 설정 반영 ----------
   form.action = CONFIG.action;
   $('sf_oid').value = CONFIG.oid;
   $('sf_retURL').value = CONFIG.retURL;
-  document.querySelectorAll('[data-sf]').forEach((el) => {
-    const id = CONFIG.fieldIds[el.dataset.sf];
-    if (id) el.name = id;
-  });
   if (CONFIG.debug) {
     $('sf_debug').disabled = false; $('sf_debug').value = '1';
     if (CONFIG.debugEmail) { $('sf_debugEmail').disabled = false; $('sf_debugEmail').value = CONFIG.debugEmail; }
     $('demoBanner').classList.add('show');
   }
 
-  // ---------- 최초 문의일 기본값 = 오늘 ----------
-  const today = new Date();
-  const pad = (n) => String(n).padStart(2, '0');
-  $('firstInquiryDate').value = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
-
-  // URL 파라미터로 유입 경로 자동 선택 (예: ?source=네이버 검색 또는 ?utm_source=naver)
+  // URL 파라미터로 상담 경로 자동 선택 (예: ?source=네이버 검색 또는 ?utm_source=naver)
   const params = new URLSearchParams(location.search);
   const sourceMap = { naver: '네이버 검색', blog: '블로그/카페', cafe: '블로그/카페', ad: '온라인 광고', google: '온라인 광고', agent: '보험 설계사 소개' };
   const src = params.get('source') || sourceMap[(params.get('utm_source') || '').toLowerCase()];
   if (src && [...$('lead_source').options].some((o) => o.value === src)) $('lead_source').value = src;
 
-  // ---------- 휴대폰 번호 자동 하이픈 ----------
+  // ---------- 입력 보조 ----------
   $('mobile').addEventListener('input', (e) => {
     const d = e.target.value.replace(/\D/g, '').slice(0, 11);
     e.target.value = d.length < 4 ? d : d.length < 8 ? `${d.slice(0, 3)}-${d.slice(3)}` : `${d.slice(0, 3)}-${d.slice(3, d.length - 4)}-${d.slice(-4)}`;
   });
+  $('elderAge').addEventListener('input', (e) => { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 3); });
+  $('consultation').addEventListener('input', (e) => { $('consultationCount').textContent = e.target.value.length.toLocaleString(); });
 
   // ---------- 전체 동의 ----------
   const agrees = [...document.querySelectorAll('.agree')];
-  $('agreeAll').addEventListener('change', (e) => agrees.forEach((c) => { c.checked = e.target.checked; }));
+  $('agreeAll').addEventListener('change', (e) => {
+    agrees.forEach((c) => { c.checked = e.target.checked; });
+    agrees.forEach((c) => c.dispatchEvent(new Event('change', { bubbles: true })));
+  });
   agrees.forEach((c) => c.addEventListener('change', () => { $('agreeAll').checked = agrees.every((x) => x.checked); }));
 
   // ---------- 유효성 검사 ----------
   const rules = {
-    facility:         () => !!form.querySelector('[data-sf="interestedFacility"]:checked'),
-    firstInquiryDate: () => !!$('firstInquiryDate').value,
-    leadSource:       () => !!$('lead_source').value,
-    seniorName:       () => $('seniorName').value.trim().length > 0,
-    last_name:        () => $('last_name').value.trim().length > 0,
-    relationship:     () => !!form.querySelector('[data-sf="guardianRelationship"]:checked'),
-    mobile:           () => /^01[016789]-?\d{3,4}-?\d{4}$/.test($('mobile').value),
-    email:            () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($('email').value.trim()),
-    privacy:          () => $('privacyConsent').checked,
+    facility:     () => !!form.querySelector('[name="00Nak00005dAlE9"]:checked'),
+    leadSource:   () => !!$('lead_source').value,
+    company:      () => $('company').value.trim().length > 0,
+    age:          () => { const v = $('elderAge').value; return v === '' || (+v >= 1 && +v <= 120); },
+    last_name:    () => $('last_name').value.trim().length > 0,
+    relationship: () => !!form.querySelector('[name="00Nak00005fPuT3"]:checked'),
+    mobile:       () => /^01[016789]-?\d{3,4}-?\d{4}$/.test($('mobile').value),
+    email:        () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($('email').value.trim()),
+    privacy:      () => $('privacyConsent').checked,
   };
   const check = (key) => {
     const ok = rules[key]();
     form.querySelector(`[data-field="${key}"]`).classList.toggle('invalid', !ok);
     return ok;
   };
-  // 라디오 그룹은 같은 name이 필요하므로, 필드 ID 치환 전이라도 그룹별 name을 보장
-  document.querySelectorAll('.seg').forEach((g, i) => g.querySelectorAll('input').forEach((r) => { if (!r.name) r.name = `grp_${i}`; }));
   Object.keys(rules).forEach((key) => {
     form.querySelector(`[data-field="${key}"]`).addEventListener('change', () => check(key));
   });
 
-  const formatDate = (iso, fmt) => {
-    const [y, m, d] = iso.split('-').map(Number);
+  const formatDate = (dt, fmt) => {
+    const y = dt.getFullYear(), m = dt.getMonth() + 1, d = dt.getDate();
     return fmt.replace('YYYY', y).replace('MM', pad(m)).replace('DD', pad(d)).replace('M', m).replace('D', d);
   };
 
+  // ---------- 제출 ----------
   form.addEventListener('submit', (e) => {
     const results = Object.keys(rules).map(check);
     if (results.includes(false)) {
       e.preventDefault();
       const first = form.querySelector('.invalid');
       first.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      const focusable = first.querySelector('input, select');
+      const focusable = first.querySelector('input, select, textarea');
       if (focusable) focusable.focus({ preventScroll: true });
       return;
     }
-    // 전송값 정리
-    $('seniorName').value = $('seniorName').value.trim();
-    $('last_name').value = $('last_name').value.trim();
-    $('email').value = $('email').value.trim();
-    $('company').value = `${$('seniorName').value} 어르신 (개인)`;
-    $('firstInquiryDateSf').value = formatDate($('firstInquiryDate').value, CONFIG.dateFormat);
-    $('marketingOptInSf').disabled = !$('marketingOptIn').checked;
-    $('privacyConsentSf').disabled = !$('privacyConsent').checked;
+    ['company', 'last_name', 'email', 'consultation'].forEach((id) => { $(id).value = $(id).value.trim(); });
+
+    // 동의 여부 + 동의 날짜(숨김값): 동의한 항목만 전송
+    const today = formatDate(new Date(), CONFIG.dateFormat);
+    const privacy = $('privacyConsent').checked;
+    const marketing = $('marketingOptIn').checked;
+    $('privacyConsentSf').disabled = !privacy;
+    $('privacyConsentDateSf').disabled = !privacy;
+    $('privacyConsentDateSf').value = today;
+    $('marketingOptInSf').disabled = !marketing;
+    $('marketingOptInDateSf').disabled = !marketing;
+    $('marketingOptInDateSf').value = today;
+
     $('submitBtn').disabled = true;
     $('submitBtn').textContent = '전송 중…';
   });

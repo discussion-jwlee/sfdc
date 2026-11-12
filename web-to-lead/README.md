@@ -6,50 +6,50 @@
 |---|---|
 | `web-to-lead/index.html` | 상담 신청 폼 (Web-to-Lead) |
 | `web-to-lead/thanks.html` | 제출 완료(retURL) 페이지 |
-| `force-app/main/default/objects/Lead/fields/` | 리드 커스텀 필드 6종 |
-| `force-app/main/default/standardValueSets/LeadSource.standardValueSet-meta.xml` | 유입 경로(리드 소스) 값 |
-| `force-app/main/default/permissionsets/LifecareLeadFields.permissionset-meta.xml` | 커스텀 필드 FLS 권한 세트 |
+| `force-app/main/default/permissionsets/LifecareLeadFields.permissionset-meta.xml` | 아래 커스텀 필드 읽기/편집 권한 세트 |
+| `force-app/main/default/standardValueSets/LeadSource.standardValueSet-meta.xml` | 상담 경로(리드 소스) 값 |
 
 ## 필드 매핑
 
-| 폼 항목 | 리드 필드 | 유형 | Web-to-Lead name |
-|---|---|---|---|
-| 관심시설 | `InterestedFacility__c` | 선택 목록 (쏠라체 홈 미사 / 쏠라체 홈 해운대 / 분당데이케어센터) | 00N… |
-| 최초 문의일 | `FirstInquiryDate__c` | 날짜 (기본값: 오늘) | 00N… |
-| 유입 경로 | `LeadSource` (표준) | 선택 목록 | `lead_source` |
-| 어르신 성함 | `SeniorName__c` | 텍스트(80) | 00N… |
-| 자녀(보호자) 성함 | `LastName` (표준) | 이름 | `last_name` |
-| 어르신과의 관계 | `GuardianRelationship__c` | 선택 목록 (자녀 / 며느리 / 배우자) | 00N… |
-| 이메일 | `Email` (표준) | 이메일 | `email` |
-| 휴대폰 번호 | `MobilePhone` (표준) | 전화 | `mobile` |
-| 마케팅 수신동의 | `MarketingOptIn__c` | 체크박스 (선택) | 00N… (체크 시 `1`) |
-| 개인정보 수집동의 | `PrivacyConsent__c` | 체크박스 (필수) | 00N… (체크 시 `1`) |
-| (자동) 회사 | `Company` (표준) | — | `company` = "{어르신 성함} 어르신 (개인)" |
-
-> 리드의 이름(LastName)은 실제 연락 대상인 **보호자**로 저장하고, 어르신 성함은 별도 필드에 둡니다.
-> 리드 변환 시 보호자가 연락처(Contact)가 됩니다.
+| 화면 항목 | 리드 필드 | 유형 | Web-to-Lead name | 비고 |
+|---|---|---|---|---|
+| 입소시설 | `Admission_Facility__c` | 다중 선택 목록 | `00Nak00005dAlE9` | 필수, 복수 선택 시 같은 name으로 여러 값 전송 |
+| 상담 경로 | `LeadSource` | 선택 목록 | `lead_source` | 필수, `?utm_source=` 로 자동 선택 |
+| 어르신명 | `Company` | 텍스트(255) | `company` | 필수 |
+| 어르신 나이 | `Elder_Age__c` | 숫자(3,0) | `00Nak00005d5QDm` | 선택, 1~120 |
+| 어르신 성별 | `Elder_Gender__c` | 선택 목록 | `00Nak00005dE89Z` | 선택, 값: 남성 / 여성 |
+| 보호자명 | `Name`(LastName) | 이름 | `last_name` | 필수 |
+| 어르신과의 관계 | `GuardianRelationship__c` | 선택 목록 | `00Nak00005fPuT3` | 필수, 값: 자녀 / 며느리 / 배우자 |
+| 휴대폰 | `MobilePhone` | 전화 | `mobile` | 필수, 하이픈 자동 입력 |
+| 이메일 | `Email` | 이메일 | `email` | 필수 |
+| 상담내용 | `Consultation_Content__c` | 긴 텍스트 영역 | `00Nak00005dEGn3` | 선택, 최대 2,000자 |
+| 개인정보 수집동의 | `PrivacyConsent__c` | 확인란 | `00Nak00005fPzR7` | 필수, `1` 전송 |
+| 개인정보 수집동의 날짜 | `PrivacyConsentDate__c` | 날짜 | `00Nak00005fPlFN` | **숨김**, 제출일 |
+| 마케팅 수신동의 | `MarketingOptIn__c` | 확인란 | `00Nak00005fPqpO` | 선택, 동의 시에만 `1` 전송 |
+| 마케팅 수신동의 날짜 | `MarketingOptInDate__c` | 날짜 | `00Nak00005fQ0Jx` | **숨김**, 동의 시에만 제출일 |
+| 리드 레코드 유형 | `RecordTypeId` | 레코드 유형 | `recordType` | **숨김**, `012ak00000EvPuTAAV` |
+| 리드 상태 | `Status` | 선택 목록 | — | 전송하지 않음 (조직 기본값) |
 
 ## 설정 순서
 
-1. **메타데이터 배포**
+1. **Web-to-Lead 활성화** — 설정 › 웹 투 리드 › 편집 › 사용, 기본 리드 작성자 지정. 데모에서는 reCAPTCHA 해제.
+2. **`index.html`의 `CONFIG` 수정**
+   - `oid`: 설정 › 회사 정보의 조직 ID (00D…)
+   - `action`: My Domain 엔드포인트를 쓰는 조직이면 `https://<MyDomain>.my.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8`
+   - `dateFormat`: 기본 리드 작성자 로캘의 날짜 형식 (`ko_KR` → `YYYY. M. D.`, `en_US` → `M/D/YYYY`). 형식이 다르면 동의 날짜가 비어 저장됩니다.
+   - 처음 연결할 때는 `debug: true`로 두면 Salesforce가 받은 값을 화면에 보여줍니다.
+3. **선택 목록 값 확인** — 폼에서 보내는 값과 조직의 API 값이 정확히 같아야 저장됩니다.
+   - 입소시설: `쏠라체 홈 미사`, `쏠라체 홈 해운대`, `분당데이케어센터`
+   - 어르신 성별: `남성`, `여성`
+   - 어르신과의 관계: `자녀`, `며느리`, `배우자`
+   - 상담 경로: 홈페이지, 네이버 검색, 블로그/카페, 온라인 광고, 보험 설계사 소개, 지인 소개, 언론 보도, 기타
+   - 레코드 유형 `012ak00000EvPuTAAV`에도 위 값들이 사용 가능으로 지정돼 있어야 합니다.
+4. (선택) 권한 세트 배포
    ```bash
-   sf project deploy start --source-dir force-app/main/default/objects/Lead force-app/main/default/standardValueSets force-app/main/default/permissionsets
-   sf org assign permset --name LifecareLeadFields
+   sf project deploy start --source-dir force-app/main/default/permissionsets
    ```
-   ⚠️ `LeadSource` StandardValueSet 배포 시 조직의 기존 리드 소스 값 목록이 이 파일의 값으로 대체됩니다. 데모 조직이 아니라면 해당 파일을 빼고 값을 수동으로 추가하세요.
-2. **Web-to-Lead 활성화** — 설정 › 웹 투 리드 › 편집 › 사용, 기본 리드 작성자 지정, reCAPTCHA는 데모에서는 해제.
-3. **ID 확인** — 설정 › 웹 투 리드 › *웹 투 리드 양식 생성*에서 위 커스텀 필드를 추가해 생성된 HTML의 `oid`와 `00N…` ID를 확인.
-4. **`index.html`의 `CONFIG` 수정**
-   - `oid`, `fieldIds`, 필요 시 `action`(My Domain 엔드포인트)
-   - `dateFormat`: 기본 리드 작성자 로캘 형식 (`ko_KR` → `YYYY. M. D.`, `en_US` → `M/D/YYYY`). 형식이 틀리면 날짜가 비어 저장됩니다.
-   - 처음 연결할 때는 `debug: true`로 두면 Salesforce가 수신한 값을 화면에 보여줍니다.
-5. 페이지를 웹서버에 올리거나 로컬에서 실행:
+   ⚠️ `LeadSource` StandardValueSet을 배포하면 조직의 기존 리드 소스 값 목록이 이 파일 값으로 대체됩니다. 조직에서 값을 직접 관리한다면 배포하지 마세요.
+5. 로컬 실행
    ```bash
    cd web-to-lead && python3 -m http.server 8080
    ```
-
-## 데모 팁
-
-- `?source=네이버 검색` 또는 `?utm_source=naver|blog|ad|agent` 파라미터로 유입 경로가 자동 선택됩니다. 채널별 링크를 따로 만들어 유입 경로 리포트를 시연할 수 있습니다.
-- 휴대폰 번호는 입력 중 자동으로 하이픈이 들어가며, 필수 항목/형식 검증 후 전송됩니다.
-- 관심시설 값을 바꿀 때는 `InterestedFacility__c` 선택 목록과 `index.html`의 라디오 버튼을 함께 수정하세요.

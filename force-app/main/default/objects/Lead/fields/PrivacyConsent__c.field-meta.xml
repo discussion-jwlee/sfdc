@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>PrivacyConsent__c</fullName>
-    <label>개인정보 수집동의</label>
-    <description>Web-to-Lead: 개인정보 수집·이용 동의 (필수)</description>
-    <defaultValue>false</defaultValue>
-    <trackHistory>false</trackHistory>
-    <type>Checkbox</type>
-</CustomField>

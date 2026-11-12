@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>MarketingOptIn__c</fullName>
-    <label>마케팅 수신동의</label>
-    <description>Web-to-Lead: 마케팅 정보 수신 동의 (선택)</description>
-    <defaultValue>false</defaultValue>
-    <trackHistory>false</trackHistory>
-    <type>Checkbox</type>
-</CustomField>
