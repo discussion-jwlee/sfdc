@@ -235,7 +235,6 @@
     <form id="leadForm" method="POST" novalidate>
       <input type="hidden" name="oid" id="sf_oid">
       <input type="hidden" name="retURL" id="sf_retURL">
-      <input type="hidden" name="encoding" value="UTF-8">
       <input type="hidden" name="recordType" value="012ak00000EvPuTAAV">
       <input type="hidden" name="debug" id="sf_debug" disabled>
       <input type="hidden" name="debugEmail" id="sf_debugEmail" disabled>
@@ -397,7 +396,7 @@
  * ===================================================================== */
 const CONFIG = {
   oid: '00Dak00001Ph5iI',
-  action: 'https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8',
+  action: 'https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8&orgId=00Dak00001Ph5iI',
   retURL: location.href.split(/[?#]/)[0].replace(/[^/]*$/, '') + 'thanks.html',
   dateFormat: 'YYYY. M. D.',
   debug: false,
