@@ -1,0 +1,10 @@
+# Salesforce CLI local state (contains org auth info)
+.sf/
+.sfdx/
+*.authurl
+.localdevserver/
+
+# OS / editor
+.DS_Store
+.vscode/
+node_modules/

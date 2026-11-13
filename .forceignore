@@ -1,0 +1,6 @@
+# Files excluded from deploy/retrieve
+package.xml
+**/jsconfig.json
+**/.eslintrc.json
+**/__tests__/**
+**/*.xlsx
